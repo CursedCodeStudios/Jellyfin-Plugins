@@ -3,6 +3,17 @@
     "guid": "42475945-c55b-4ba9-bfd4-884d5cd8a829",
     "versions": [
       {
+        "version": "0.1.0.6",
+        "changelog": "Release 0.1.0.6.",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "https://github.com/CursedCodeStudios/Continuum/releases/download/v0.1.0.6/Continuum_0.1.0.6.zip",
+        "checksum": "e80019a176c116714c229cb6ca101304",
+        "timestamp": "2026-06-16T03:58:09Z",
+        "repositoryName": "CursedCodeStudios Jellyfin Plugins",
+        "repositoryUrl": "https://raw.githubusercontent.com/CursedCodeStudios/Jellyfin-Plugins/main/manifest.json",
+        "url": "https://github.com/CursedCodeStudios/Continuum"
+      },
+      {
         "version": "0.1.0.5",
         "changelog": "Release 0.1.0.5.",
         "targetAbi": "10.11.0.0",
