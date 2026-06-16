@@ -1,0 +1,20 @@
+{
+  "event_type": "update-plugin-release",
+  "client_payload": {
+    "pluginGuid": "11111111-2222-3333-4444-555555555555",
+    "pluginName": "Continuum",
+    "description": "Creates rolling per-user playlists from manually ordered movie and episode lists.",
+    "overview": "Continuum turns manually maintained chronological or canonical watch orders into per-user rolling Jellyfin playlists.",
+    "owner": "CursedCodeStudios",
+    "category": "General",
+    "version": "0.1.0.0",
+    "targetAbi": "10.11.0.0",
+    "checksum": "SHA256_CHECKSUM_HERE",
+    "timestamp": "2026-01-01T00:00:00Z",
+    "sourceUrl": "https://github.com/CursedCodeStudios/Jellyfin.Plugin.Continuum",
+    "changelog": "Initial release.",
+    "repositoryName": "CursedCodeStudios Jellyfin Plugin Repository",
+    "repositoryUrl": "https://raw.githubusercontent.com/CursedCodeStudios/Jellyfin-Plugins/main/manifest.json",
+    "url": "https://github.com/CursedCodeStudios/Jellyfin.Plugin.Continuum/releases/download/v0.1.0.0/Jellyfin.Plugin.Continuum_0.1.0.0.zip"
+  }
+}

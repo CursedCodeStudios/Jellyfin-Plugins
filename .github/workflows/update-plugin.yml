@@ -1,0 +1,141 @@
+name: Update Plugin Manifest
+
+on:
+  repository_dispatch:
+    types: [update-plugin-release]
+  workflow_dispatch:
+    inputs:
+      pluginGuid:
+        description: Jellyfin plugin GUID
+        required: true
+        type: string
+      pluginName:
+        description: Jellyfin plugin name
+        required: true
+        type: string
+      version:
+        description: Plugin version
+        required: true
+        type: string
+      targetAbi:
+        description: Target Jellyfin ABI version
+        required: true
+        type: string
+      checksum:
+        description: SHA256 checksum for the release archive
+        required: true
+        type: string
+      timestamp:
+        description: Release timestamp in ISO-8601 format
+        required: false
+        type: string
+      sourceUrl:
+        description: Source repository URL
+        required: true
+        type: string
+      url:
+        description: Download URL for the plugin archive
+        required: true
+        type: string
+      description:
+        description: Short plugin description
+        required: false
+        type: string
+      overview:
+        description: Longer plugin overview
+        required: false
+        type: string
+      owner:
+        description: Plugin owner
+        required: false
+        type: string
+      category:
+        description: Jellyfin plugin category
+        required: false
+        type: string
+      changelog:
+        description: Release notes for this version
+        required: false
+        type: string
+      repositoryName:
+        description: Repository display name in Jellyfin
+        required: false
+        type: string
+      repositoryUrl:
+        description: Public manifest URL
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: jellyfin-plugin-manifest
+  cancel-in-progress: false
+
+jobs:
+  update-manifest:
+    runs-on: ubuntu-latest
+    env:
+      PLUGIN_GUID: ${{ github.event.client_payload.pluginGuid || github.event.inputs.pluginGuid }}
+      PLUGIN_NAME: ${{ github.event.client_payload.pluginName || github.event.inputs.pluginName }}
+      DESCRIPTION: ${{ github.event.client_payload.description || github.event.inputs.description }}
+      OVERVIEW: ${{ github.event.client_payload.overview || github.event.inputs.overview }}
+      OWNER: ${{ github.event.client_payload.owner || github.event.inputs.owner }}
+      CATEGORY: ${{ github.event.client_payload.category || github.event.inputs.category }}
+      VERSION: ${{ github.event.client_payload.version || github.event.inputs.version }}
+      TARGET_ABI: ${{ github.event.client_payload.targetAbi || github.event.inputs.targetAbi }}
+      CHECKSUM: ${{ github.event.client_payload.checksum || github.event.inputs.checksum }}
+      TIMESTAMP: ${{ github.event.client_payload.timestamp || github.event.inputs.timestamp }}
+      SOURCE_URL: ${{ github.event.client_payload.sourceUrl || github.event.inputs.sourceUrl }}
+      CHANGELOG: ${{ github.event.client_payload.changelog || github.event.inputs.changelog }}
+      REPOSITORY_NAME: ${{ github.event.client_payload.repositoryName || github.event.inputs.repositoryName }}
+      REPOSITORY_URL: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.repositoryUrl || 'https://raw.githubusercontent.com/CursedCodeStudios/Jellyfin-Plugins/main/manifest.json') || github.event.client_payload.repositoryUrl }}
+      DOWNLOAD_URL: ${{ github.event.client_payload.url || github.event.inputs.url }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Update manifest
+        run: |
+          python3 scripts/update_manifest.py \
+            --manifest-path manifest.json \
+            --plugin-guid "$PLUGIN_GUID" \
+            --plugin-name "$PLUGIN_NAME" \
+            --description "$DESCRIPTION" \
+            --overview "$OVERVIEW" \
+            --owner "$OWNER" \
+            --category "$CATEGORY" \
+            --version "$VERSION" \
+            --target-abi "$TARGET_ABI" \
+            --checksum "$CHECKSUM" \
+            --timestamp "$TIMESTAMP" \
+            --source-url "$SOURCE_URL" \
+            --changelog "$CHANGELOG" \
+            --repository-name "$REPOSITORY_NAME" \
+            --repository-url "$REPOSITORY_URL" \
+            --url "$DOWNLOAD_URL"
+
+      - name: Validate manifest JSON
+        run: python3 -m json.tool manifest.json > /dev/null
+
+      - name: Configure git author
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit manifest changes
+        run: |
+          if git diff --quiet -- manifest.json; then
+            echo "manifest.json is unchanged."
+            exit 0
+          fi
+
+          git add manifest.json
+          git commit -m "Update ${PLUGIN_NAME} manifest to ${VERSION}"
+          git push
